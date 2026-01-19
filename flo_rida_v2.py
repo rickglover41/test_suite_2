@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from flo_finance import flo_finance, flo_finance_alt
+from flo_finance_v2 import flo_finance, flo_finance_alt
 
 # -------------------------
 # Page Config (must come first)
