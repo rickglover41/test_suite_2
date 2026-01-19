@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from flo_finance_v2 import flo_finance, flo_finance_alt
+from flo_finance import flo_finance, flo_finance_alt
 
 # -------------------------
 # Page Config (must come first)
@@ -117,7 +117,7 @@ with st.sidebar.expander("ℹ️ Data & Calculation Notes", expanded=False):
 
 	st.markdown(
 		f"""
-		<div style="background-color:#b2dfdb;padding:10px;border-radius:5px;font-style:italic;">
+		<div style="background-color:#b2dfdb;color:black;padding:10px;border-radius:5px;font-style:italic;">
 		<p>1. All rate and staffing information pulled from HCRIS FY2024. Agency FTE use ({agency_fte}) assumes 80% RN mix at 1872 hours annually.</p>
 		<p>2. Savings estimated over a 3-year period.</p>
 		</div>
@@ -165,10 +165,10 @@ st.markdown(
 		<span style='font-weight:bold;font-size:18px;'>Florence Financial Savings</span>
 		{badge}
 	</div>
-	<div style='background:#d4edda;padding:15px;border-radius:5px;font-size:20px;font-weight:bold;margin-top:10px;'>
+	<div style='background:#d4edda;color:black;padding:15px;border-radius:5px;font-size:20px;font-weight:bold;margin-top:10px;'>
 		Estimated Financial Savings: ${result:,.2f}
 	</div>
-	<div style='background:#e9ecef;padding:10px;border-radius:5px;font-size:16px;font-style:italic;margin-top:8px;'>
+	<div style='background:#e9ecef;color:black;padding:10px;border-radius:5px;font-size:16px;font-style:italic;margin-top:8px;'>
 		Inputs → Staff Labor Rate: ${staff_rate:,.2f}, Agency Labor Rate: ${agency_rate:,.2f}, Estimated RN Need: {rn_needed:.1f}
 	</div>
 	""",
