@@ -75,7 +75,7 @@ def styled_readonly(label, value):
 		""",
 		unsafe_allow_html=True
 	)
-	
+
 # -------------------------
 # Get defaults based on mode
 # -------------------------
@@ -83,7 +83,7 @@ if mode == "Health System":
 	name_lookup = {v["Health_System_Name"]: k for k, v in health_systems.items()}
 	choice_name = st.selectbox("Choose a health system (type to search)", sorted(name_lookup.keys()))
 	defaults = health_systems[name_lookup[choice_name]]
-	
+
 	read_only_data = {
 		"Health System Name": defaults["Health_System_Name"],
 		"Bed Size": round(float(defaults["Bed_Size"])),
@@ -97,14 +97,14 @@ else:
 	name_lookup = {v["Hospital_Name"]: k for k, v in hospitals_in_state.items()}
 	choice_name = st.selectbox("Choose a hospital (type to search)", sorted(name_lookup.keys()))
 	defaults = hospitals[name_lookup[choice_name]]
-	
+
 	read_only_data = {
 		"Hospital Name": defaults["Hospital_Name"],
 		"Bed Size": round(float(defaults["Bed_Size"])),
 		"State": defaults["State"],
 		"Health Care Affiliation": defaults.get("Health_System_Name", "N/A"),
 	}
-	
+
 # -------------------------
 # Sidebar notes
 # -------------------------
@@ -114,7 +114,7 @@ with st.sidebar.expander("ℹ️ Data & Calculation Notes", expanded=False):
 		agency_fte = round(float(agency_fte), 1)
 	except:
 		pass
-		
+
 	st.markdown(
 		f"""
 		<div style="background-color:#b2dfdb;color:black;padding:10px;border-radius:5px;font-style:italic;">
@@ -124,7 +124,7 @@ with st.sidebar.expander("ℹ️ Data & Calculation Notes", expanded=False):
 		""",
 		unsafe_allow_html=True
 	)
-	
+
 # -------------------------
 # Calculation Section (shared logic)
 # -------------------------
@@ -134,26 +134,12 @@ agency_gt_staff = str(defaults.get("Agency>Staff", True)).lower() == "true"
 st.subheader("Current Rates/Staffing (Can Edit)")
 
 st.markdown("<label style='font-weight:bold;font-size:20px;'>Estimated RN Need</label>", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-/* Force black text for input labels and help text */
-label, .stTextInput label, .stSelectbox label, .stMultiselect label, .stNumberInput label {
-    color: black !important;
-}
-
-/* Force black text inside widgets */
-.stTextInput input, .stNumberInput input {
-    color: black !important;
-}
-</style>
-""", unsafe_allow_html=True)
 rn_input = st.text_input("", f"{rn_needed:.1f}", label_visibility="collapsed")
 try:
 	rn_needed = round(float(rn_input), 1)
 except:
 	pass
-	
+
 st.markdown(
 	"""
 	<style>
@@ -172,7 +158,7 @@ if agency_gt_staff:
 else:
 	result = flo_finance_alt(staff_rate, agency_rate, rn_needed)
 	badge = "<span style='background:#fff3cd;color:#856404;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:bold;'>ALT FORMULA</span>"
-	
+
 st.markdown(
 	f"""
 	<div style='border:2px solid #444;padding:10px;border-radius:5px;display:flex;justify-content:space-between;align-items:center;'>
@@ -195,6 +181,4 @@ st.markdown(
 st.subheader("Information")
 for label, value in read_only_data.items():
 	styled_readonly(label, value)
-
-
 
