@@ -60,10 +60,7 @@ hospitals = load_hospitals()
 # Streamlit UI
 # -------------------------
 st.title("Florence Financial Impact")
-st.caption(
-	"Note: If hospital or health system does not appear in the dropdown, there was no publicly reported Contracted Labor data to the HCRIS for that organization"
-)
-
+st.caption("Note: If hospital or health system does not appear in the dropdown, there was no publicly reported Contracted Labor data to the HCRIS for that organization")
 mode = st.radio("Search for Health System or Hospital", ["Health System", "Individual Hospital"])
 
 # -------------------------
@@ -72,27 +69,21 @@ mode = st.radio("Search for Health System or Hospital", ["Health System", "Indiv
 def styled_readonly(label, value):
 	st.markdown(
 		f"""
-		<div style="
-			background-color: #cfe2f3;
-			color: black;
-			padding: 10px 12px;
-			border-radius: 5px;
-			margin-bottom: 8px;
-			font-size: 16px;">
-			<b>{label}:</b> {value}
+		<div style="background-color:#cfe2f3;padding:10px 12px;border-radius:5px;margin-bottom:8px;font-size:16px;">
+		<b>{label}:</b> {value}
 		</div>
 		""",
 		unsafe_allow_html=True
 	)
-	
+
 # -------------------------
-# Mode-specific defaults
+# Get defaults based on mode
 # -------------------------
 if mode == "Health System":
 	name_lookup = {v["Health_System_Name"]: k for k, v in health_systems.items()}
 	choice_name = st.selectbox("Choose a health system (type to search)", sorted(name_lookup.keys()))
 	defaults = health_systems[name_lookup[choice_name]]
-	
+
 	read_only_data = {
 		"Health System Name": defaults["Health_System_Name"],
 		"Bed Size": round(float(defaults["Bed_Size"])),
@@ -106,14 +97,14 @@ else:
 	name_lookup = {v["Hospital_Name"]: k for k, v in hospitals_in_state.items()}
 	choice_name = st.selectbox("Choose a hospital (type to search)", sorted(name_lookup.keys()))
 	defaults = hospitals[name_lookup[choice_name]]
-	
+
 	read_only_data = {
 		"Hospital Name": defaults["Hospital_Name"],
 		"Bed Size": round(float(defaults["Bed_Size"])),
 		"State": defaults["State"],
 		"Health Care Affiliation": defaults.get("Health_System_Name", "N/A"),
 	}
-	
+
 # -------------------------
 # Sidebar notes
 # -------------------------
@@ -123,7 +114,7 @@ with st.sidebar.expander("ℹ️ Data & Calculation Notes", expanded=False):
 		agency_fte = round(float(agency_fte), 1)
 	except:
 		pass
-		
+
 	st.markdown(
 		f"""
 		<div style="background-color:#b2dfdb;padding:10px;border-radius:5px;font-style:italic;">
@@ -133,7 +124,7 @@ with st.sidebar.expander("ℹ️ Data & Calculation Notes", expanded=False):
 		""",
 		unsafe_allow_html=True
 	)
-	
+
 # -------------------------
 # Calculation Section (shared logic)
 # -------------------------
@@ -148,7 +139,7 @@ try:
 	rn_needed = round(float(rn_input), 1)
 except:
 	pass
-	
+
 st.markdown(
 	"""
 	<style>
@@ -167,7 +158,7 @@ if agency_gt_staff:
 else:
 	result = flo_finance_alt(staff_rate, agency_rate, rn_needed)
 	badge = "<span style='background:#fff3cd;color:#856404;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:bold;'>ALT FORMULA</span>"
-	
+
 st.markdown(
 	f"""
 	<div style='border:2px solid #444;padding:10px;border-radius:5px;display:flex;justify-content:space-between;align-items:center;'>
@@ -177,6 +168,9 @@ st.markdown(
 	<div style='background:#d4edda;padding:15px;border-radius:5px;font-size:20px;font-weight:bold;margin-top:10px;'>
 		Estimated Financial Savings: ${result:,.2f}
 	</div>
+	<div style='background:#e9ecef;padding:10px;border-radius:5px;font-size:16px;font-style:italic;margin-top:8px;'>
+		Inputs → Staff Labor Rate: ${staff_rate:,.2f}, Agency Labor Rate: ${agency_rate:,.2f}, Estimated RN Need: {rn_needed:.1f}
+	</div>
 	""",
 	unsafe_allow_html=True
 )
@@ -185,10 +179,6 @@ st.markdown(
 # Information Section
 # -------------------------
 st.subheader("Information")
-for k, v in read_only_data.items():
-	styled_readonly(k, v)
+for label, value in read_only_data.items():
+	styled_readonly(label, value)
 
-
-	
-
-	
