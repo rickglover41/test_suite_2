@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import streamlit as st
 import pandas as pd
 from flo_finance_v2 import flo_finance, flo_finance_alt
@@ -60,7 +62,9 @@ hospitals = load_hospitals()
 # Streamlit UI
 # -------------------------
 st.title("Florence Financial Impact")
-st.caption("Note: If hospital or health system does not appear in the dropdown, there was no publicly reported Contracted Labor data to the HCRIS for that organization")
+st.caption(
+	"Note: If hospital or health system does not appear in the dropdown, there was no publicly reported Contracted Labor data for FY2024 to the HCRIS for that organization as of Jan 1 2026"
+)
 mode = st.radio("Search for Health System or Hospital", ["Health System", "Individual Hospital"])
 
 # -------------------------
@@ -75,7 +79,7 @@ def styled_readonly(label, value):
 		""",
 		unsafe_allow_html=True
 	)
-
+	
 # -------------------------
 # Get defaults based on mode
 # -------------------------
@@ -83,7 +87,7 @@ if mode == "Health System":
 	name_lookup = {v["Health_System_Name"]: k for k, v in health_systems.items()}
 	choice_name = st.selectbox("Choose a health system (type to search)", sorted(name_lookup.keys()))
 	defaults = health_systems[name_lookup[choice_name]]
-
+	
 	read_only_data = {
 		"Health System Name": defaults["Health_System_Name"],
 		"Bed Size": round(float(defaults["Bed_Size"])),
@@ -97,14 +101,14 @@ else:
 	name_lookup = {v["Hospital_Name"]: k for k, v in hospitals_in_state.items()}
 	choice_name = st.selectbox("Choose a hospital (type to search)", sorted(name_lookup.keys()))
 	defaults = hospitals[name_lookup[choice_name]]
-
+	
 	read_only_data = {
 		"Hospital Name": defaults["Hospital_Name"],
 		"Bed Size": round(float(defaults["Bed_Size"])),
 		"State": defaults["State"],
 		"Health Care Affiliation": defaults.get("Health_System_Name", "N/A"),
 	}
-
+	
 # -------------------------
 # Sidebar notes
 # -------------------------
@@ -114,7 +118,7 @@ with st.sidebar.expander("ℹ️ Data & Calculation Notes", expanded=False):
 		agency_fte = round(float(agency_fte), 1)
 	except:
 		pass
-
+		
 	st.markdown(
 		f"""
 		<div style="background-color:#b2dfdb;color:black;padding:10px;border-radius:5px;font-style:italic;">
@@ -124,9 +128,9 @@ with st.sidebar.expander("ℹ️ Data & Calculation Notes", expanded=False):
 		""",
 		unsafe_allow_html=True
 	)
-
+	
 # -------------------------
-# Calculation Section (shared logic)
+# Calculation Section
 # -------------------------
 rn_needed = round(float(defaults.get("Estimated_RN_Need", 0)), 1)
 agency_gt_staff = str(defaults.get("Agency>Staff", True)).lower() == "true"
@@ -139,7 +143,7 @@ try:
 	rn_needed = round(float(rn_input), 1)
 except:
 	pass
-
+	
 st.markdown(
 	"""
 	<style>
@@ -149,8 +153,12 @@ st.markdown(
 	unsafe_allow_html=True
 )
 
-staff_rate = st.number_input("Staff Labor Rate ($)", value=float(defaults["Staff_Labor_Rate"]), step=0.01, format="%.2f")
-agency_rate = st.number_input("Agency Labor Rate ($)", value=float(defaults["Agency_Labor_Rate"]), step=0.01, format="%.2f")
+staff_rate = st.number_input(
+	"Staff Labor Rate ($)", value=float(defaults["Staff_Labor_Rate"]), step=0.01, format="%.2f"
+)
+agency_rate = st.number_input(
+	"Agency Labor Rate ($)", value=float(defaults["Agency_Labor_Rate"]), step=0.01, format="%.2f"
+)
 
 if agency_gt_staff:
 	result = flo_finance(staff_rate, agency_rate, rn_needed)
@@ -158,6 +166,9 @@ if agency_gt_staff:
 else:
 	result = flo_finance_alt(staff_rate, agency_rate, rn_needed)
 	badge = "<span style='background:#fff3cd;color:#856404;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:bold;'>ALT FORMULA</span>"
+	
+# NEW: Annual savings calculation
+annual_result = result / 3
 
 st.markdown(
 	f"""
@@ -165,9 +176,15 @@ st.markdown(
 		<span style='font-weight:bold;font-size:18px;'>Florence Financial Savings</span>
 		{badge}
 	</div>
+
 	<div style='background:#d4edda;color:black;padding:15px;border-radius:5px;font-size:20px;font-weight:bold;margin-top:10px;'>
-		Estimated Financial Savings: ${result:,.2f}
+		Estimated Total Financial Savings (3 Years): ${result:,.2f}
 	</div>
+
+	<div style='background:#e2f0e9;color:black;padding:12px;border-radius:5px;font-size:18px;font-weight:bold;margin-top:8px;'>
+		Estimated Annual Financial Savings: ${annual_result:,.2f}
+	</div>
+
 	<div style='background:#e9ecef;color:black;padding:10px;border-radius:5px;font-size:16px;font-style:italic;margin-top:8px;'>
 		Inputs → Staff Labor Rate: ${staff_rate:,.2f}, Agency Labor Rate: ${agency_rate:,.2f}, Estimated RN Need: {rn_needed:.1f}
 	</div>
@@ -181,4 +198,4 @@ st.markdown(
 st.subheader("Information")
 for label, value in read_only_data.items():
 	styled_readonly(label, value)
-
+	
